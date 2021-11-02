@@ -1,0 +1,125 @@
+using Lib.Domain.Exceptions;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+ 
+namespace Hospital.Domain.Services.FileHandling
+{
+    public class FileHandlerService : IFileHandlerService
+    {
+        private readonly IFileStorage storage;
+ 
+        public FileHandlerService(IFileStorage storage)
+        {
+            this.storage = storage;
+        }
+ 
+        public async Task<(string ContainerName, string FileName)> CopyFileFromContainerAsync(string sourceContainer, string sourceFileName, string destinationContainer)
+        {
+            var extension = Path.GetExtension(sourceFileName);
+            ValidateUpload(destinationContainer, extension);
+ 
+            using (var stream = new MemoryStream())
+            {
+                await storage.DownloadFile(stream, sourceContainer, sourceFileName);
+ 
+                var fileName = Guid.NewGuid() + extension;
+ 
+                await storage.SaveFile(stream, destinationContainer, fileName, FileContainerProvider.ContainerSettings[destinationContainer].IsPublic);
+ 
+                return (destinationContainer, fileName);
+            }
+        }
+ 
+        public async Task DownloadFromContainerAsync(Stream stream, string fileName, string containerName)
+        {
+            ValidateContainerName(containerName);
+ 
+            await storage.DownloadFile(stream, containerName, fileName);
+        }
+ 
+        public string GetFileUrl(string containerName, string fileName)
+        {
+            ValidateContainerName(containerName);
+ 
+            if (!FileContainerProvider.ContainerSettings[containerName].IsPublic)
+            {
+                throw new ArgumentException($"The container is not public hence it has no Url.", nameof(containerName));
+            }
+ 
+            return storage.GetFileUrl(containerName, fileName);
+        }
+ 
+        public async Task<(string ContainerName, string FileName)> UploadFromByteArrayAsync(byte[] fileBytes, string containerName, string extension)
+        {
+            ValidateUpload(containerName, extension);
+ 
+            var tempfile = Path.GetTempFileName();
+            try
+            {
+                using (var stream = File.Create(tempfile))
+                {
+                    Stream byteStream = new MemoryStream(fileBytes);
+                    var fileName = Guid.NewGuid() + extension;
+ 
+                    await storage.SaveFile(byteStream, containerName, fileName, FileContainerProvider.ContainerSettings[containerName].IsPublic);
+ 
+                    return (containerName, fileName);
+                }
+            }
+            finally
+            {
+                File.Delete(tempfile);
+            }
+        }
+ 
+        public async Task<(string ContainerName, string FileName)> UploadFromStreamAsync(Stream stream, string containerName, string extension)
+        {
+            ValidateUpload(containerName, extension);
+ 
+            var fileName = Guid.NewGuid() + extension;
+ 
+            await storage.SaveFile(stream, containerName, fileName, FileContainerProvider.ContainerSettings[containerName].IsPublic);
+ 
+            return (containerName, fileName);
+        }
+ 
+        public Task UploadFromStreamAsync(Stream stream, string containerName, string extension, string fileName)
+        {
+            ValidateUpload(containerName, extension);
+ 
+            fileName += extension;
+ 
+            return storage.SaveFile(stream, containerName, fileName, FileContainerProvider.ContainerSettings[containerName].IsPublic);
+        }
+ 
+        public async Task<bool> GetIfFileExistsAsync(string container, string fileName)
+        {
+            return await storage.GetIfFileExists(container, fileName);
+        }
+ 
+        private static void ValidateContainerName(string containerName)
+        {
+            if (string.IsNullOrWhiteSpace(containerName))
+            {
+                throw new ArgumentNullException(nameof(containerName));
+            }
+ 
+            if (!FileContainerProvider.ContainerSettings.ContainsKey(containerName))
+            {
+                throw new ArgumentException("Invalid container name.") { Source = nameof(containerName) };
+            }
+        }
+ 
+        private static void ValidateUpload(string containerName, string extension)
+        {
+            ValidateContainerName(containerName);
+ 
+            if (!FileContainerProvider.ContainerSettings[containerName].Extensions.Contains(extension, StringComparer.InvariantCultureIgnoreCase))
+            {
+                throw new DomainException("Invalid file extension.") { Source = nameof(extension) };
+            }
+        }
+    }
+}

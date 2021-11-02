@@ -1,0 +1,12 @@
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\bin\Release\net5.0\FileHostingApp.BLL.deps.json
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\bin\Release\net5.0\FileHostingApp.BLL.dll
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\bin\Release\net5.0\ref\FileHostingApp.BLL.dll
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\bin\Release\net5.0\FileHostingApp.BLL.pdb
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.csprojAssemblyReference.cache
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.AssemblyInfoInputs.cache
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.AssemblyInfo.cs
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.dll
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\ref\FileHostingApp.BLL.dll
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Release\net5.0\FileHostingApp.BLL.pdb
