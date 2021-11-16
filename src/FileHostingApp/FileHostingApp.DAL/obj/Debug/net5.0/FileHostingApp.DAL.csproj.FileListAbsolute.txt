@@ -10,3 +10,6 @@ C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\obj\Debug\ne
 C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\obj\Debug\net5.0\FileHostingApp.DAL.dll
 C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\obj\Debug\net5.0\ref\FileHostingApp.DAL.dll
 C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\obj\Debug\net5.0\FileHostingApp.DAL.pdb
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\bin\Debug\net5.0\FileHostingApp.DAL.runtimeconfig.json
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\bin\Debug\net5.0\FileHostingApp.DAL.runtimeconfig.dev.json
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.DAL\obj\Debug\net5.0\FileHostingApp.DAL.genruntimeconfig.cache

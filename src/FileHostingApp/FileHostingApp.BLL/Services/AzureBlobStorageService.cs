@@ -3,6 +3,10 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FileHostingApp.BLL.DTOs.ViewModels;
 using FileHostingApp.BLL.Interfaces;
+using FileHostingApp.DAL.DbContexts;
+using FileHostingApp.DAL.Entities;
+using FileHostingApp.DAL.Enums;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,15 +23,18 @@ namespace FileHostingApp.BLL.Services
         private readonly BlobServiceClient _blobServiceClient;
         private readonly IHashingService _hashingService;
         private readonly IMapper _mapper;
+        private readonly FileHostingDbContext _dbContext;
 
         public AzureBlobStorageService(
             BlobServiceClient blobServiceClient,
             IHashingService hashingService,
-            IMapper mapper)
+            IMapper mapper,
+            FileHostingDbContext dbContext)
         {
             _blobServiceClient = blobServiceClient;
             _hashingService = hashingService;
             _mapper = mapper;
+            _dbContext = dbContext;
         }
 
         public async Task SaveOrOverwriteFileAsync(string fileName, Stream file, CancellationToken cancellationToken)
@@ -35,18 +42,38 @@ namespace FileHostingApp.BLL.Services
             var container = GetBlobContainer("");
             var blob = container.GetBlobClient(fileName);
             var hash = _hashingService.MD5FromStream(file);
+
+            await _dbContext.History.AddAsync(new DAL.Entities.FileHistoryEntry
+            {
+                Action = DAL.Enums.FileAction.Edit,
+                Hash = hash,
+                Path = fileName,
+                Timestamp = DateTime.UtcNow
+            }, cancellationToken);
+
             await blob.UploadAsync(file, true, cancellationToken);
             await blob.SetTagsAsync(new Dictionary<string, string>() {
                 { "hash", hash },
-                { "lastModified", DateTime.Now.ToString() }
+                { "lastModified", DateTime.UtcNow.ToString() }
             });
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeleteFileAsync(string fileName, CancellationToken cancellationToken)
         {
-            var container = GetBlobContainer(string.Join('/', fileName.Split("/").SkipLast(1)));
-            var blob = container.GetBlobClient(fileName.Split("/").Last());
+            await _dbContext.History.AddAsync(new DAL.Entities.FileHistoryEntry
+            {
+                Action = DAL.Enums.FileAction.Delete,
+                Path = fileName,
+                Timestamp = DateTime.UtcNow
+            }, cancellationToken);
+           
+            var container = GetBlobContainer("");
+            var blob = container.GetBlobClient(fileName);
             await blob.DeleteAsync(cancellationToken: cancellationToken);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Stream> DownloadFileAsync(string filePath, CancellationToken cancellationToken)
@@ -63,10 +90,17 @@ namespace FileHostingApp.BLL.Services
             var asyncEnumerator = container.GetBlobsAsync(BlobTraits.Tags, cancellationToken: cancellationToken).GetAsyncEnumerator(cancellationToken);
             while (await asyncEnumerator.MoveNextAsync())
             {
-                //fileNames.Add(asyncEnumerator.Current.Name);
                 fileDatas.Add(_mapper.Map<FileMetadataViewModel>(asyncEnumerator.Current));
             }
             return fileDatas;
+        }
+
+        public async Task<IEnumerable<FileHistoryEntry>> GetHistoryAsync(string filterFilename, FileAction? filterAction, CancellationToken cancellationToken)
+        {
+            return await _dbContext.History
+                .Where(x => filterFilename == null ? true : x.Path == filterFilename)
+                .Where(x => filterAction == null ? true : x.Action == filterAction)
+                .ToListAsync(cancellationToken);
         }
 
         private BlobContainerClient GetBlobContainer(string folderPath)

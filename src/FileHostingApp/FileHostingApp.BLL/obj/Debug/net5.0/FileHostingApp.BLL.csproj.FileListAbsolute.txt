@@ -10,3 +10,6 @@ C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Debug\ne
 C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Debug\net5.0\FileHostingApp.BLL.dll
 C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Debug\net5.0\ref\FileHostingApp.BLL.dll
 C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Debug\net5.0\FileHostingApp.BLL.pdb
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\bin\Debug\net5.0\FileHostingApp.DAL.dll
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\bin\Debug\net5.0\FileHostingApp.DAL.pdb
+C:\Users\Mate\Desktop\önlab2\src\FileHostingApp\FileHostingApp.BLL\obj\Debug\net5.0\FileHostingApp.BLL.csproj.CopyComplete

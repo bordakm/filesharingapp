@@ -14,6 +14,8 @@ using FileHostingApp.BLL.Interfaces;
 using FileHostingApp.BLL.Services;
 using Azure.Storage.Blobs;
 using FileHostingApp.API.Extensions;
+using FileHostingApp.DAL.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace FileHostingApp.API
 {
@@ -38,6 +40,9 @@ namespace FileHostingApp.API
             services.AddSingleton(x => new BlobServiceClient(Configuration.GetValue<string>("AZURE_BLOB_STORAGE_CONNECTION_STRING")));
             services.AddDefaultServices();
             services.AddAutoMapperProfiles();
+
+            services.AddDbContext<FileHostingDbContext>(o => o.UseSqlite("DataSource=filehosting.db"));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

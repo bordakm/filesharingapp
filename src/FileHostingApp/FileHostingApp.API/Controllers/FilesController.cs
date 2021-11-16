@@ -1,5 +1,6 @@
 ﻿using FileHostingApp.BLL.DTOs.ViewModels;
 using FileHostingApp.BLL.Interfaces;
+using FileHostingApp.DAL.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -43,10 +44,7 @@ namespace FileHostingApp.API.Controllers
         {
             foreach (var formFile in formFiles)
             {
-                if (formFile.Length > 0)
-                {
-                    await _storageService.SaveOrOverwriteFileAsync(formFile.FileName, formFile.OpenReadStream(), cancellationToken);
-                }
+                await _storageService.SaveOrOverwriteFileAsync(formFile.FileName, formFile.OpenReadStream(), cancellationToken);
             }
             return Ok();
         }
@@ -54,10 +52,8 @@ namespace FileHostingApp.API.Controllers
         [HttpPost("upload")]
         public async Task<ActionResult> UploadMultipleFiles([FromForm] IFormFile formFile, CancellationToken cancellationToken)
         {
-            if (formFile.Length > 0)
-            {
-                await _storageService.SaveOrOverwriteFileAsync(formFile.FileName, formFile.OpenReadStream(), cancellationToken);
-            }
+            await _storageService.SaveOrOverwriteFileAsync(formFile.FileName, formFile.OpenReadStream(), cancellationToken);
+
             return Ok();
         }
 
@@ -66,5 +62,12 @@ namespace FileHostingApp.API.Controllers
         {
             return await _storageService.ListFilesAsync(cancellationToken);
         }
+
+        [HttpGet("deletehistory")]
+        public async Task<IEnumerable<FileHistoryEntry>> GetFileHistory([FromQuery] string path, CancellationToken cancellationToken)
+        {
+            return await _storageService.GetHistoryAsync(path, DAL.Enums.FileAction.Delete, cancellationToken);
+        }
+
     }
 }

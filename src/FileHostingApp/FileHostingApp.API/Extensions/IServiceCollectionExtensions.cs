@@ -15,8 +15,8 @@ namespace FileHostingApp.API.Extensions
         public static IServiceCollection AddDefaultServices(this IServiceCollection serviceCollection)
         {
             return serviceCollection
-                         .AddSingleton<IStorageService, AzureBlobStorageService>()
-            .AddTransient<IHashingService, HashingService>();
+                .AddScoped<IStorageService, AzureBlobStorageService>()
+                .AddTransient<IHashingService, HashingService>();
         }
         public static IServiceCollection AddAutoMapperProfiles(this IServiceCollection serviceCollection)
         {

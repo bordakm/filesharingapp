@@ -1,4 +1,6 @@
 ﻿using FileHostingApp.BLL.DTOs.ViewModels;
+using FileHostingApp.DAL.Entities;
+using FileHostingApp.DAL.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +15,7 @@ namespace FileHostingApp.BLL.Interfaces
     {
         Task DeleteFileAsync(string fileName, CancellationToken cancellationToken);
         Task<Stream> DownloadFileAsync(string filePath, CancellationToken cancellationToken);
+        Task<IEnumerable<FileHistoryEntry>> GetHistoryAsync(string filterFilename, FileAction? filterAction, CancellationToken cancellationToken);
         Task<IEnumerable<FileMetadataViewModel>> ListFilesAsync(CancellationToken cancellationToken);
         Task SaveOrOverwriteFileAsync(string fileName, Stream file, CancellationToken cancellationToken);
     }

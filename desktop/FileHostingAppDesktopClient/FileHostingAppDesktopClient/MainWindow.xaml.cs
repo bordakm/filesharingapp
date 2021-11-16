@@ -22,15 +22,38 @@ namespace FileHostingAppDesktopClient
     public partial class MainWindow : Window
     {
         private SyncService _syncService;
+        public string BaseFolder { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
             _syncService = new SyncService();
+            _syncService.MessageEvent += HandleSyncEvent;
+        }
+
+        private void HandleSyncEvent(object sender, string e)
+        {
+            logTextBox.Text += e + Environment.NewLine;
+            logTextBox.ScrollToEnd();
         }
 
         private void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             _syncService.SyncAsync();
+        }
+
+        private void SettingsButtonClick(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();                
+                ((MainWindow)Application.Current.MainWindow).BaseFolder = dialog.SelectedPath.Replace("\\", "/");
+            }
+
+            CredentialsWindow sw = new CredentialsWindow();
+            sw.Show();
         }
     }
 }
