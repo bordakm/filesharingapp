@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<parameters>
-  <parameter name="IIS Web Application Name" description="" value="TestWebApp1147546458495166" tags="IisApp">
-    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\Mate\\Desktop\\önlab2\\src\\FileHostingApp\\FileHostingApp\.API\\obj\\Release\\net5\.0\\PubTmp\\Out\\$" />
-  </parameter>
-</parameters>

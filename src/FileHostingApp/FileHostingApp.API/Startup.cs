@@ -16,6 +16,7 @@ using Azure.Storage.Blobs;
 using FileHostingApp.API.Extensions;
 using FileHostingApp.DAL.DbContexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace FileHostingApp.API
 {
@@ -42,6 +43,9 @@ namespace FileHostingApp.API
             services.AddAutoMapperProfiles();
 
             services.AddDbContext<FileHostingDbContext>(o => o.UseSqlite("DataSource=filehosting.db"));
+
+            services.AddIdentity<IdentityUser, IdentityRole>(options => { })
+                .AddEntityFrameworkStores<FileHostingDbContext>();
 
         }
 
