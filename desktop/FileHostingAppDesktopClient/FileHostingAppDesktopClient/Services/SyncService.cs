@@ -128,37 +128,6 @@ namespace FileHostingAppDesktopClient.Services
             }
 
 
-
-            //filesToUpload = localFileDatas.Where(x => !remoteFileDatas.Any(y => y.RelativePathWithFilename == x.RelativePathWithFilename && x.Hash == y.Hash)).ToList();
-            //filesToDownload = remoteFileDatas.Where(x => !localFileDatas.Any(y => y.RelativePathWithFilename == x.RelativePathWithFilename && x.Hash == y.Hash)).ToList();
-
-            //foreach (var fileMetadata in filesToUpload)
-            //{
-            //    var form = new MultipartFormDataContent();
-            //    var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(localRootPath + fileMetadata.RelativePathWithFilename));
-            //    fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
-            //    form.Add(fileContent, "formFile", fileMetadata.RelativePathWithFilename);
-
-            //    var response = await _httpClient.PostAsync("files/upload", form);
-            //    response.EnsureSuccessStatusCode();
-            //    var responseContent = await response.Content.ReadAsStringAsync();
-            //}
-
-            //foreach (var fileMetadata in filesToDownload)
-            //{
-            //    UriBuilder builder = new UriBuilder(_httpClient.BaseAddress + "files/download");
-            //    builder.Query = "filePath=" + fileMetadata.RelativePathWithFilename;
-            //    var response = await _httpClient.GetAsync(builder.Uri);
-
-
-            //    Directory.CreateDirectory(localRootPath + fileMetadata.RelativeFileLocation);
-
-
-            //    using (var fs = new FileStream(localRootPath + fileMetadata.RelativePathWithFilename, FileMode.Create))
-            //    {
-            //        await response.Content.CopyToAsync(fs);
-            //    }
-            //}
             var localFilesAfterSync = Directory.GetFiles(localRootPath, "*", new EnumerationOptions { RecurseSubdirectories = true }).Select(x => x.Replace("\\", "/"));
             using (FileHostingDbContext dbContext = new FileHostingDbContext())
             {
@@ -323,6 +292,16 @@ namespace FileHostingAppDesktopClient.Services
             }
 
             public string Message { get; set; }
+        }
+
+        public async Task WipeLocalFileHistory()
+        {
+            using (FileHostingDbContext dbContext = new FileHostingDbContext())
+            {
+                dbContext.Files.RemoveRange(dbContext.Files);
+                dbContext.History.RemoveRange(dbContext.History);
+                await dbContext.SaveChangesAsync();
+            }
         }
     }
 }

@@ -81,7 +81,8 @@ namespace FileHostingApp.BLL.Services
 
         public async Task<Stream> DownloadFileAsync(string filePath, CancellationToken cancellationToken)
         {
-            var container = GetBlobContainer(string.Join('/', filePath.Split("/").SkipLast(1)) + "/");
+            //var container = GetBlobContainer(string.Join('/', filePath.Split("/").SkipLast(1)) + "/");
+            var container = GetBlobContainer("");
             var blob = container.GetBlobClient(filePath);
             return (await blob.DownloadContentAsync(cancellationToken)).Value.Content.ToStream();
         }
@@ -110,7 +111,8 @@ namespace FileHostingApp.BLL.Services
         {
             string userId = _identityService.GetCurrentUserId();
             if (userId == null) throw new Exception("User not found!");
-            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(userId + "/" + folderPath);
+            var containerPath = userId + "/" + folderPath;
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(containerPath);
             bool isExist = containerClient.Exists();
             if (!isExist)
             {

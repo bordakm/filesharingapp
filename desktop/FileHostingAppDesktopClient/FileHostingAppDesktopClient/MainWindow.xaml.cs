@@ -1,7 +1,9 @@
 ﻿using FileHostingAppDesktopClient.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,13 +23,16 @@ namespace FileHostingAppDesktopClient
     /// </summary>
     public partial class MainWindow : Window
     {
+
         private SyncService _syncService;
         private AuthService _authService;
         public string BaseFolder { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string Jwt { get; set; }
-
+        public bool SyncRunning { get; set; }
+        private DebounceDispatcher debounceTimer = new DebounceDispatcher();
+        FileSystemWatcher watcher;
         public MainWindow()
         {
             InitializeComponent();
@@ -35,7 +40,56 @@ namespace FileHostingAppDesktopClient
             SetControlsVisibilityLoggedOut();
             BaseFolder = Settings1.Default.localRootPath;
             buttonBaseFolder.ToolTip = BaseFolder;
+            StartWatcher(BaseFolder);
         }
+
+        ~MainWindow()
+        {
+            if (watcher != null)
+            {
+                watcher.Dispose();
+            }
+        }
+
+        private void StartWatcher(string path)
+        {
+            if (watcher != null)
+            {
+                watcher.Dispose();
+            }
+            watcher = new FileSystemWatcher(path);
+            watcher.NotifyFilter = NotifyFilters.Attributes
+                                | NotifyFilters.CreationTime
+                                | NotifyFilters.DirectoryName
+                                | NotifyFilters.FileName
+                                | NotifyFilters.LastAccess
+                                | NotifyFilters.LastWrite
+                                | NotifyFilters.Security
+                                | NotifyFilters.Size;
+
+            watcher.Changed += Watcher_Changed;
+            watcher.Created += Watcher_Changed;
+            watcher.Deleted += Watcher_Changed;
+            watcher.Renamed += Watcher_Changed;
+            watcher.Filter = "*";
+            watcher.IncludeSubdirectories = true;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            if (!SyncRunning)
+            {
+                if (Jwt != null)
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        SyncDebounced();
+                    });
+                }
+            }
+        }
+
 
         private void HandleSyncEvent(object sender, string e)
         {
@@ -53,10 +107,17 @@ namespace FileHostingAppDesktopClient
             Sync();
         }
 
+        public void SyncDebounced()
+        {
+            debounceTimer.Debounce(5000, x => Sync());
+        }
+
         public async Task Sync()
         {
+            if (SyncRunning) return;
             try
             {
+                SyncRunning = true;
                 buttonSyncNow.IsEnabled = false;
                 await _syncService.SyncAsync();
             }
@@ -67,6 +128,7 @@ namespace FileHostingAppDesktopClient
             finally
             {
                 buttonSyncNow.IsEnabled = true;
+                SyncRunning = false; 
             }
         }
 
@@ -83,6 +145,9 @@ namespace FileHostingAppDesktopClient
 
                     _syncService = new SyncService(Settings1.Default.cloudAddress, BaseFolder, Jwt);
                     _syncService.MessageEvent += HandleSyncEvent;
+
+                    _syncService.WipeLocalFileHistory();
+                    StartWatcher(newPath);
                 }
             }
         }
@@ -140,6 +205,7 @@ namespace FileHostingAppDesktopClient
         private void clearLogsButton_Click(object sender, RoutedEventArgs e)
         {
             logTextBox.Text = "";
+
         }
     }
 }
