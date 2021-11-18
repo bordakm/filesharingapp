@@ -16,6 +16,7 @@ namespace FileHostingApp.API.Extensions
         {
             return serviceCollection
                 .AddScoped<IStorageService, AzureBlobStorageService>()
+                .AddScoped<IIdentityService, IdentityService>()
                 .AddTransient<IHashingService, HashingService>();
         }
         public static IServiceCollection AddAutoMapperProfiles(this IServiceCollection serviceCollection)

@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FileHostingAppDesktopClient" GeneratedClassName="Settings1">
+  <Profiles />
+  <Settings>
+    <Setting Name="cloudAddress" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:30001/</Value>
+    </Setting>
+    <Setting Name="localRootPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:/Users/Mate/Desktop/tmp/filehosting/</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

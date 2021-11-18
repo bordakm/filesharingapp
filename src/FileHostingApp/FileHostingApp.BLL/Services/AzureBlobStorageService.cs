@@ -24,17 +24,20 @@ namespace FileHostingApp.BLL.Services
         private readonly IHashingService _hashingService;
         private readonly IMapper _mapper;
         private readonly FileHostingDbContext _dbContext;
+        private readonly IIdentityService _identityService;
 
         public AzureBlobStorageService(
             BlobServiceClient blobServiceClient,
             IHashingService hashingService,
             IMapper mapper,
-            FileHostingDbContext dbContext)
+            FileHostingDbContext dbContext,
+            IIdentityService identityService)
         {
             _blobServiceClient = blobServiceClient;
             _hashingService = hashingService;
             _mapper = mapper;
             _dbContext = dbContext;
+            _identityService = identityService;
         }
 
         public async Task SaveOrOverwriteFileAsync(string fileName, Stream file, CancellationToken cancellationToken)
@@ -68,7 +71,7 @@ namespace FileHostingApp.BLL.Services
                 Path = fileName,
                 Timestamp = DateTime.UtcNow
             }, cancellationToken);
-           
+
             var container = GetBlobContainer("");
             var blob = container.GetBlobClient(fileName);
             await blob.DeleteAsync(cancellationToken: cancellationToken);
@@ -105,8 +108,14 @@ namespace FileHostingApp.BLL.Services
 
         private BlobContainerClient GetBlobContainer(string folderPath)
         {
-            // TODO: auth alapján container választás?
-            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient("my-container/" + folderPath);
+            string userId = _identityService.GetCurrentUserId();
+            if (userId == null) throw new Exception("User not found!");
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(userId + "/" + folderPath);
+            bool isExist = containerClient.Exists();
+            if (!isExist)
+            {
+                containerClient.Create();
+            }
             return containerClient;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using FileHostingApp.BLL.DTOs.ViewModels;
 using FileHostingApp.BLL.Interfaces;
 using FileHostingApp.DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace FileHostingApp.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class FilesController : ControllerBase
@@ -26,7 +28,6 @@ namespace FileHostingApp.API.Controllers
         [HttpGet("download")]
         public async Task<Stream> DownloadFile([FromQuery] string filePath, CancellationToken cancellationToken)
         {
-            var x = Request.QueryString;
             var file = await _storageService.DownloadFileAsync(filePath, cancellationToken);
             return file;
         }
@@ -34,7 +35,6 @@ namespace FileHostingApp.API.Controllers
         [HttpDelete]
         public async Task<ActionResult> DeleteFile([FromQuery] string filePath, CancellationToken cancellationToken)
         {
-            var x = Request.QueryString;
             await _storageService.DeleteFileAsync(filePath, cancellationToken);
             return Ok();
         }

@@ -1,4 +1,5 @@
-﻿using FileHostingAppDesktopClient.Context;
+﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using FileHostingAppDesktopClient.Context;
 using FileHostingAppDesktopClient.Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -18,16 +19,20 @@ namespace FileHostingAppDesktopClient.Services
     class SyncService
     {
         HttpClient _httpClient;
-        //private static string cloudBaseAddress = "http://testwebapp1147546458495166.azurewebsites.net/";
-        private static string cloudBaseAddress = "http://localhost:30001/";
-        public static string localRootPath = @"C:/Users/Mate/Desktop/tmp/filehosting/";
+        //private string cloudBaseAddress = "http://testwebapp1147546458495166.azurewebsites.net/";
+        private string cloudBaseAddress;
+        //private string cloudBaseAddress = "http://localhost:30001/";
+        public string localRootPath;
+        //public string localRootPath = @"C:/Users/Mate/Desktop/tmp/filehosting/";
         HashingService _hashingService;
-        //public delegate void MessageEventHandler(object sender, MessageEventArgs args);
         public event EventHandler<string> MessageEvent;
-        public SyncService()
+        public SyncService(string cloudBaseAddress, string localRootPath, string bearer)
         {
+            this.cloudBaseAddress = cloudBaseAddress;
+            this.localRootPath = localRootPath;
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(cloudBaseAddress);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             _hashingService = new HashingService();
         }
         private void LogEvent(string message)
@@ -60,7 +65,7 @@ namespace FileHostingAppDesktopClient.Services
                         RelativeFileLocation = relativeFilePath.Replace(fileName, ""),
                         FileName = fileName,
                         Hash = hash,
-                        LastModified = File.GetLastWriteTimeUtc(localFilePath)
+                        LastModified = new DateTime(Math.Max(File.GetCreationTimeUtc(localFilePath).Ticks, File.GetLastWriteTimeUtc(localFilePath).Ticks))
                     });
                 }
             }
@@ -69,7 +74,7 @@ namespace FileHostingAppDesktopClient.Services
             //var filesToDownload = new List<FileMetadata>();
             //var filesToDeleteLocally = new List<FileMetadata>();
             //var filesToDeleteRemotely = new List<FileMetadata>();
-            
+
 
             var localFilesWithSameNameDifferentHash = localFileDatas.Where(x => remoteFileDatas.Select(y => y.FileName).Contains(x.FileName) && remoteFileDatas.First(y => y.FileName == x.FileName).Hash != x.Hash);
             foreach (var localFile in localFilesWithSameNameDifferentHash)
@@ -170,7 +175,7 @@ namespace FileHostingAppDesktopClient.Services
                         {
                             Path = relativeFilePath,
                             Hash = hash,
-                            LastModified = File.GetLastWriteTimeUtc(localFilePath)
+                            LastModified = new DateTime(Math.Max(File.GetCreationTimeUtc(localFilePath).Ticks, File.GetLastWriteTimeUtc(localFilePath).Ticks))
                         };
 
                         await dbContext.Files.AddAsync(fe);
@@ -245,7 +250,7 @@ namespace FileHostingAppDesktopClient.Services
                                 Action = Enums.FileAction.Edit,
                                 Hash = hash,
                                 Path = relativeFilePath,
-                                Timestamp = File.GetLastWriteTimeUtc(localFilePath)
+                                Timestamp = new DateTime(Math.Max(File.GetCreationTimeUtc(localFilePath).Ticks, File.GetLastWriteTimeUtc(localFilePath).Ticks))
                             };
                             await dbContext.History.AddAsync(fhe);
                         }

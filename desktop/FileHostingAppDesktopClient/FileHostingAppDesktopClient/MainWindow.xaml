@@ -5,18 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileHostingAppDesktopClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="File hosting app client" Height="450" Width="800">
     <DockPanel>
+        <Label x:Name="loginStatusLabel" DockPanel.Dock="Top">Not logged in</Label>
         <StackPanel Margin="10,20,10,20">
-            <Button Margin="0,0,0,10" Width="Auto" DockPanel.Dock="Left" Height="40" Click="SettingsButtonClick">
-                <TextBlock>Base<LineBreak/>Folder</TextBlock>
+            <Button x:Name="buttonBaseFolder" Margin="0,0,0,10" Width="Auto" Height="40" Click="BaseFolderPickerButtonClick" FontWeight="Bold">
+                <TextBlock FontFamily="Arial" FontWeight="Normal">Base<LineBreak/>Folder</TextBlock>
             </Button>
-            <Button Click="SyncButton_Click" Margin="0,10,0,10" DockPanel.Dock="Left" Height="40">
-                Sync
+
+            <Button x:Name="buttonSyncNow" Click="SyncButton_Click" Margin="0,0,0,10" Height="40" FontWeight="Bold">
+                <TextBlock FontFamily="Arial" FontWeight="Normal">Sync<LineBreak/>now</TextBlock>               
             </Button>
-        </StackPanel>            
+
+            <Button x:Name="buttonLogout" Margin="0,0,0,10" Width="Auto" Height="40" FontWeight="Bold" Click="LogoutButtonClick">
+                <TextBlock FontFamily="Arial" FontWeight="Normal">Logout</TextBlock>
+            </Button>
+
+            <Button x:Name="buttonLogin" Margin="0,0,0,10" Width="Auto" Height="40" FontWeight="Bold" Click="LoginButtonClick">
+                <TextBlock FontFamily="Arial" FontWeight="Normal">Login</TextBlock>
+            </Button>
+        </StackPanel>
+        <DockPanel DockPanel.Dock="Right">
+            <Button x:Name="clearLogsButton" DockPanel.Dock="Bottom" Margin="0,0,20,10" Click="clearLogsButton_Click">Clear logs</Button>
+            <TextBox x:Name="logTextBox" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" Margin="0,20,20,10" />
+        </DockPanel>
         
-        <TextBox x:Name="logTextBox" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" Margin="0,20,20,20" DockPanel.Dock="Right"/>
         
     </DockPanel>
 </Window>

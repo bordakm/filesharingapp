@@ -19,14 +19,21 @@ namespace FileHostingAppDesktopClient
     /// </summary>
     public partial class CredentialsWindow : Window
     {
-        public CredentialsWindow()
+        public CredentialsWindow(string currentEmail, string currentPassword)
         {
             InitializeComponent();
+            textBoxEmail.Text = currentEmail;
+            textBoxPassword.Password = currentPassword;
         }
 
         private void SaveCredentialsButtonClick(object sender, RoutedEventArgs e)
         {
-           
+            ((MainWindow)Application.Current.MainWindow).Email = textBoxEmail.Text;
+            ((MainWindow)Application.Current.MainWindow).Password = textBoxPassword.Password;
+
+            ((MainWindow)Application.Current.MainWindow).Login();
+
+            this.Close();
         }
     }
 }
