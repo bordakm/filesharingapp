@@ -29,7 +29,6 @@ namespace FileHostingAppDesktopClient
         private void SaveCredentialsButtonClick(object sender, RoutedEventArgs e)
         {
             ((MainWindow)Application.Current.MainWindow).Email = textBoxEmail.Text;
-            ((MainWindow)Application.Current.MainWindow).Password = textBoxPassword.Password;
 
             ((MainWindow)Application.Current.MainWindow).Login();
 

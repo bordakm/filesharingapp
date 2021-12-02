@@ -1,4 +1,5 @@
 ﻿using FileHostingAppDesktopClient.Services;
+using IdentityModel.OidcClient;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +29,6 @@ namespace FileHostingAppDesktopClient
         private AuthService _authService;
         public string BaseFolder { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
         public string Jwt { get; set; }
         public bool SyncRunning { get; set; }
         private DebounceDispatcher debounceTimer = new DebounceDispatcher();
@@ -157,18 +157,16 @@ namespace FileHostingAppDesktopClient
             Logout();
         }
 
-        private void LoginButtonClick(object sender, RoutedEventArgs e)
+        private async void LoginButtonClick(object sender, RoutedEventArgs e)
         {
-            CredentialsWindow sw = new CredentialsWindow(Email, Password);
-            sw.Show();
-        }
-
-        public async void Login()
-        {
-            var loginResult = await _authService.Login(Email, Password);
-            if (loginResult.Success)
+            var result = await _authService.InitLogin();
+            //CredentialsWindow sw = new CredentialsWindow(Email, Password);
+            //sw.Show();
+            if (!result.IsError)
             {
-                Jwt = loginResult.Jwt;
+                Email = result.User.Identity.Name;
+                Jwt = result.IdentityToken;
+
                 loginStatusLabel.Content = "Logged in as: " + Email;
                 SetControlsVisibilityLoggedIn();
                 _syncService = new SyncService(Settings1.Default.cloudAddress, BaseFolder, Jwt);
@@ -179,7 +177,6 @@ namespace FileHostingAppDesktopClient
         public void Logout()
         {
             Email = null;
-            Password = null;
             Jwt = null;
             loginStatusLabel.Content = "Not logged in";
             SetControlsVisibilityLoggedOut();
@@ -205,7 +202,6 @@ namespace FileHostingAppDesktopClient
         private void clearLogsButton_Click(object sender, RoutedEventArgs e)
         {
             logTextBox.Text = "";
-
         }
     }
 }
