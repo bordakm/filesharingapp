@@ -1,5 +1,6 @@
-using FileHostingAppServer.Data;
-using FileHostingAppServer.Models;
+using Azure.Storage.Blobs;
+using FileHostingAppServer.DAL.DbContexts;
+using FileHostingAppServer.DAL.Entities;
 using FileHostingAppServer.Providers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -24,30 +25,42 @@ namespace FileHostingAppServer
         }
 
         public IConfiguration Configuration { get; }
-        private const string _defaultTokenProviderName = "Default";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+
+            services.AddSingleton(x => new BlobServiceClient(Configuration.GetValue<string>("AZURE_BLOB_STORAGE_CONNECTION_STRING")));
+            services.AddDefaultServices();
+            services.AddAutoMapperProfiles();
+
+            services.AddDbContext<FileHostingDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-
-            //services.Configure<DefaultDataProtectorTokenProviderOptions>(o =>
+            //services.AddDefaultIdentity<ApplicationUser>(options =>
             //{
-            //    o.TokenLifespan = TimeSpan.FromSeconds(20);
+            //    options.Password.RequireDigit = false;
+            //    options.Password.RequireLowercase = false;
+            //    options.Password.RequireNonAlphanumeric = false;
+            //    options.Password.RequireUppercase = false;
+            //    options.Password.RequiredLength = 2;
             //});
 
-            services.AddDefaultIdentity<ApplicationUser>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true;
-            });
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 2;
+            })
+            .AddEntityFrameworkStores<FileHostingDbContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                .AddApiAuthorization<ApplicationUser, FileHostingDbContext>();
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
@@ -61,8 +74,9 @@ namespace FileHostingAppServer
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FileHostingDbContext dbContext)
         {
+            dbContext.Database.Migrate();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
