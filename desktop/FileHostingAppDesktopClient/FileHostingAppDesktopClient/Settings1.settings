@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="cloudAddress" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:30001/</Value>
+      <Value Profile="(Default)">https://localhost:44359/</Value>
     </Setting>
     <Setting Name="localRootPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:/Users/Mate/Desktop/tmp/filehosting/</Value>

@@ -1,10 +1,8 @@
 ﻿using FileHostingAppDesktopClient.Services;
-using IdentityModel.OidcClient;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -128,7 +126,7 @@ namespace FileHostingAppDesktopClient
             finally
             {
                 buttonSyncNow.IsEnabled = true;
-                SyncRunning = false; 
+                SyncRunning = false;
             }
         }
 
@@ -159,9 +157,11 @@ namespace FileHostingAppDesktopClient
 
         private async void LoginButtonClick(object sender, RoutedEventArgs e)
         {
-            var result = await _authService.InitLogin();
             //CredentialsWindow sw = new CredentialsWindow(Email, Password);
             //sw.Show();
+
+            var result = await _authService.InitLogin();
+            if (result == null) LogMessage("Auth error!");
             if (!result.IsError)
             {
                 Email = result.User.Identity.Name;

@@ -275,6 +275,9 @@ namespace FileHostingAppDesktopClient.Services
             return historyEntries;
         }
 
+
+
+
         private byte[] StreamToByteArray(Stream stream)
         {
             int length = Convert.ToInt32(stream.Length);

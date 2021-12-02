@@ -25,7 +25,7 @@ namespace FileHostingAppDesktopClient {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:30001/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost:44359/")]
         public string cloudAddress {
             get {
                 return ((string)(this["cloudAddress"]));

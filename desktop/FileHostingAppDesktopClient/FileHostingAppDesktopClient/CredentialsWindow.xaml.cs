@@ -30,7 +30,7 @@ namespace FileHostingAppDesktopClient
         {
             ((MainWindow)Application.Current.MainWindow).Email = textBoxEmail.Text;
 
-            ((MainWindow)Application.Current.MainWindow).Login();
+            //((MainWindow)Application.Current.MainWindow).Login();
 
             this.Close();
         }
